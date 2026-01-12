@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>教育訓練滿意度調查與報告</title>
-    <!-- 載入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* 使用 Inter 字體 */
@@ -73,7 +72,6 @@
 <body>
 
 <div id="app" class="min-h-screen p-4 sm:p-8">
-    <!-- 導航/狀態切換 -->
     <div class="max-w-4xl mx-auto mb-6 flex justify-between items-center">
         <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">教育訓練滿意度系統</h1>
         <button id="toggleViewBtn" class="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg shadow-md hover:bg-indigo-700 transition duration-150 ease-in-out transform hover:scale-105">
@@ -82,7 +80,6 @@
     </div>
 
     <div id="content" class="max-w-4xl mx-auto bg-white p-6 sm:p-10 rounded-xl shadow-2xl">
-        <!-- 內容將由 JavaScript 動態插入 -->
         <div class="flex justify-center items-center h-48">
             <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -92,7 +89,6 @@
         </div>
     </div>
 
-    <!-- 提示框 Modal -->
     <div id="modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div id="modalMessage" class="mt-3 text-center text-lg font-medium text-gray-800"></div>
@@ -108,10 +104,10 @@
 <script>
     // ----------------------------------------------------------------------
     // --- 🚨 重要設定：Google Apps Script Web App URL ---
-    // 請將 YOUR_DEPLOYED_WEB_APP_URL 替換為您部署 Google Apps Script 後獲得的實際 URL
+    // !!! 請務必將下方的佔位符替換為您部署 Google Apps Script 後獲得的實際 /exec URL !!!
     // ----------------------------------------------------------------------
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxqMfeDnEI0Dt0yR6t_H9k0-5a41YlSl4biiG1iEPJyT0mQ1Uz1WY1CfkBOUZ7RzfVB/exec';
-    
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxqMfeDnEI0Dt0yR6t_H9k0-5a41YlSl4biiG1iEPJyT0mQ1Uz1WY1CfkBOUZ7RzfVB/exec'; // <-- 替換此處為您的真實 URL
+
     // 為了模擬用戶 ID，我們使用一個基於瀏覽器的 ID
     const getUserId = () => {
         let id = localStorage.getItem('surveyUserId');
@@ -137,7 +133,7 @@
         '一般員工'
     ];
 
-    // 問卷問題定義 (與原版相同)
+    // 問卷問題定義
     const questions = {
         '一、講師之勝任程度': {
             'Q1_1': '與課程主題相關之主題能力',
@@ -211,17 +207,14 @@
                     <strong class="text-indigo-600">學員 ID ${userId.substring(0, 8)}...：</strong> 您的填寫結果將被用於數據統計，且不會直接連結至您的身份，請安心填寫。(* 標記為必填)
                 </p>
 
-                <!-- 基本資料 -->
                 <div class="space-y-4 mb-10 p-6 bg-gray-50 rounded-lg border">
                     <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2">基本資訊</h2>
 
-                    <!-- 課程編號 -->
                     <div>
                         <label for="courseId" class="block text-sm font-medium text-gray-700">課程編號 *</label>
                         <input type="text" id="courseId" name="courseId" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm uppercase" placeholder="例如: ABC101">
                     </div>
 
-                    <!-- 填表人職等 -->
                     <div>
                         <label for="jobTitle" class="block text-sm font-medium text-gray-700">填表人職等 *</label>
                         <select id="jobTitle" name="jobTitle" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
@@ -231,7 +224,6 @@
                     </div>
                 </div>
 
-                <!-- 滿意度問卷 -->
                 ${Object.entries(questions).slice(0, 3).map(([category, qs]) => `
                     <div class="mb-10">
                         <h2 class="text-2xl font-semibold text-gray-700 mb-6 border-b-2 border-indigo-500 pb-2">${category}</h2>
@@ -250,7 +242,6 @@
                     </div>
                 `).join('')}
 
-                <!-- 簡答題 -->
                 <div class="mb-10">
                     <h2 class="text-2xl font-semibold text-gray-700 mb-6 border-b-2 border-indigo-500 pb-2">${questions['四、簡答題 (非必填)']['Q4_1'].split('.')[0]}. 簡答題 (非必填)</h2>
                     <div class="space-y-6">
@@ -279,9 +270,13 @@
     /** 處理問卷提交 (使用 fetch 連接到 Google Apps Script) */
     const handleSurveySubmit = async (event) => {
         event.preventDefault();
-        
-        if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbxqMfeDnEI0Dt0yR6t_H9k0-5a41YlSl4biiG1iEPJyT0mQ1Uz1WY1CfkBOUZ7RzfVB/exec') {
-            showModal("錯誤：請先完成 Google Apps Script 部署，並更新 APPS_SCRIPT_URL。");
+
+        // ** 檢查 APPS_SCRIPT_URL 是否已替換 **
+        if (APPS_SCRIPT_URL === 'YOUR_DEPLOYED_WEB_APP_URL') {
+            showModal(`
+                <p class="text-red-600 font-bold">部署錯誤！</p>
+                <p class="text-sm mt-2">請先完成 Google Apps Script 部署，並將 HTML 程式碼中的 APPS_SCRIPT_URL 變數替換成您實際取得的 /exec 網址。</p>
+            `);
             return;
         }
 
@@ -321,7 +316,7 @@
         // 收集簡答題
         submission.Q4_1_text = data.get('Q4_1') || '';
         submission.Q4_2_text = data.get('Q4_2') || '';
-        
+
         try {
             // 發送 JSON 數據到 Apps Script Web App
             const response = await fetch(APPS_SCRIPT_URL, {
@@ -331,8 +326,8 @@
             });
 
             if (!response.ok) {
-                // 處理網路層級的錯誤
-                throw new Error(`HTTP 錯誤: ${response.status}`);
+                // 處理網路層級的錯誤 (例如 500 伺服器錯誤)
+                throw new Error(`HTTP 錯誤: ${response.status} ${response.statusText}`);
             }
 
             const result = await response.json();
@@ -344,12 +339,19 @@
                 showModal(`您已填寫過課程編號 ${courseId} 的問卷。`);
             } else {
                 // 處理 Apps Script 返回的其他錯誤
-                showModal(`提交失敗: ${result.message || 'Apps Script 處理錯誤。'}`);
+                showModal(`
+                    提交失敗: ${result.message || 'Apps Script 處理錯誤。'}
+                    <p class="text-xs text-gray-500 mt-2">請檢查 Apps Script 的執行紀錄 (Execution Logs)。</p>
+                `);
             }
 
         } catch (error) {
             console.error("提交問卷時發生錯誤: ", error);
-            showModal(`提交失敗，請檢查 Apps Script URL 或網路連線。錯誤訊息: ${error.message}`);
+            showModal(`
+                <p class="text-red-600 font-bold">連線失敗！</p>
+                <p class="text-sm mt-2">請確認您的 Apps Script URL 和部署權限 (設為「任何人」)。</p>
+                <p class="text-xs text-gray-500 mt-1">錯誤訊息: ${error.message}</p>
+            `);
         } finally {
             submitButton.disabled = false;
             submitButton.textContent = '提交問卷';
@@ -357,11 +359,10 @@
     };
 
     // --- 報告相關 Helper Functions ---
-
     /** 獲取報告數據 (使用 fetch 連接到 Google Apps Script) */
     const fetchReportData = async () => {
         if (APPS_SCRIPT_URL === 'YOUR_DEPLOYED_WEB_APP_URL') {
-            contentDiv.innerHTML = `<div class="text-center py-10 bg-red-100 rounded-lg shadow-inner"><p class="text-xl text-red-700 font-bold">請先部署 Google Apps Script 並設定 APPS_SCRIPT_URL。</p></div>`;
+             contentDiv.innerHTML = `<div class="text-center py-10 bg-red-100 rounded-lg shadow-inner"><p class="text-xl text-red-700 font-bold">請先部署 Google Apps Script 並設定 APPS_SCRIPT_URL。</p></div>`;
             return;
         }
 
@@ -381,8 +382,7 @@
             const response = await fetch(`${APPS_SCRIPT_URL}?action=get_reports`);
             if (!response.ok) throw new Error('伺服器響應錯誤');
 
-            const result = await response.json();
-            
+            const result = await response.json();                        
             if (result.status === 'success') {
                 evaluationsData = result.data || [];
                 renderReportView(evaluationsData);
@@ -392,10 +392,10 @@
 
         } catch (error) {
             console.error("獲取報告數據時發生錯誤: ", error);
-            contentDiv.innerHTML = `<div class="text-center py-10 bg-red-100 rounded-lg shadow-inner"><p class="text-xl text-red-700 font-bold">載入報告數據失敗，請檢查 Apps Script 設定。</p></div>`;
+            contentDiv.innerHTML = `<div class="text-center py-10 bg-red-100 rounded-lg shadow-inner"><p class="text-xl text-red-700 font-bold">載入報告數據失敗，請檢查 Apps Script 設定。</p><p class="text-sm text-gray-700 mt-2">錯誤訊息: ${error.message}</p></div>`;
         }
     };
-    
+
     /** 計算平均分數 */
     const calculateAverages = (data) => {
         const stats = {};
@@ -475,15 +475,13 @@
         let html = `
             <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-2">滿意度調查報告 (HR 課長)</h2>
 
-            <!-- 課程篩選與總覽 -->
             <div class="mb-8 p-4 bg-indigo-50 rounded-lg border border-indigo-200">
                 <label for="courseFilter" class="block text-lg font-semibold text-indigo-800 mb-2">選擇課程編號查看詳細報告:</label>
                 <select id="courseFilter" class="block w-full border-indigo-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg">
                     <option value="ALL">-- 顯示所有課程 (共 ${data.length} 筆回覆) --</option>
                     ${courseIds.map(id => `<option value="${id}">${id} (共 ${stats[id].totalCount} 筆回覆)</option>`).join('')}
                 </select>
-            </div>
-            
+            </div>                        
             <div id="reportDetail">
                 ${renderCourseDetailReport('ALL', stats)}
             </div>
@@ -503,17 +501,17 @@
             Object.keys(questions['二、課程內容']),
             Object.keys(questions['三、辦訓單位行政作業'])
         );
-        
+
         const coursesToDisplay = courseId === 'ALL' ? Object.keys(stats) : [courseId];
 
-        if (coursesToDisplay.length === 0) {
+        if (coursesToDisplay.length === 0) { 
              return `<p class="text-center text-xl text-red-500 py-10">查無資料</p>`;
         }
 
         coursesToDisplay.forEach(id => {
             const currentStats = stats[id];
             const isAll = courseId === 'ALL';
-            
+
             // 處理總平均
             const totalAvgScore = (keys.reduce((sum, key) => sum + parseFloat(currentStats.averages[key]), 0) / keys.length).toFixed(2);
             const totalAvgColor = totalAvgScore >= 4 ? 'bg-green-500' : totalAvgScore >= 3 ? 'bg-yellow-500' : 'bg-red-500';
@@ -522,7 +520,7 @@
                 <div class="${!isAll ? 'mt-8 border-t-4 border-indigo-600 pt-6' : 'mt-4'} p-4 bg-gray-50 rounded-lg shadow-inner">
                     <h3 class="text-2xl font-bold text-indigo-800 mb-4">${isAll ? '總體趨勢' : `課程編號: ${id} 詳細報告`}</h3>
                     <p class="text-gray-700 mb-4">總填寫人數: <span class="text-2xl font-extrabold text-indigo-600">${currentStats.totalCount}</span> 筆</p>
-                    
+
                     <div class="p-4 rounded-lg shadow-md mb-6 ${totalAvgColor} text-white">
                         <p class="text-xl font-medium">課程整體滿意度平均:</p>
                         <p class="text-4xl font-extrabold">${totalAvgScore} <span class="text-2xl">/ 5.00</span></p>
@@ -576,13 +574,11 @@
                 </div>
             `;
         });
-        
+
         return html;
     };
 
-
     // --- 應用程式啟動 ---
-
     const initApp = () => {
         // 預設切換到問卷模式
         switchView('survey');
