@@ -3,80 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>教育訓練滿意度調查與報告</title>
+    <title>教育訓練滿意度系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         body { font-family: 'Inter', 'Noto Sans TC', sans-serif; background-color: #f4f7f9; }
-        .rating-input { opacity: 0; position: absolute; width: 1px; height: 1px; overflow: hidden; }
+        .rating-input { opacity: 0; position: absolute; width: 1px; height: 1px; }
         .rating-label {
             display: flex; align-items: center; justify-content: center;
             width: 40px; height: 40px; border-radius: 9999px; cursor: pointer;
             transition: all 0.2s; font-weight: 600; color: #4b5563; border: 2px solid #e5e7eb;
         }
-        .rating-input:checked + .rating-label { background-color: #3b82f6; color: white; border-color: #3b82f6; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .chart-bar { height: 16px; border-radius: 4px; transition: width 0.5s; }
+        .rating-input:checked + .rating-label {
+            background-color: #3b82f6; color: white; border-color: #3b82f6;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .report-table th, .report-table td { padding: 12px 16px; border-bottom: 1px solid #e5e7eb; }
+        .chart-bar { height: 10px; border-radius: 4px; transition: width 0.5s; }
     </style>
 </head>
 <body>
+
 <div id="app" class="min-h-screen p-4 sm:p-8">
     <div class="max-w-4xl mx-auto mb-6 flex justify-between items-center">
         <h1 class="text-3xl font-extrabold text-gray-900">教育訓練滿意度系統</h1>
-        <button id="toggleViewBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700">切換至報告模式 (HR 課長)</button>
+        <button id="toggleViewBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700">
+            切換至報告模式
+        </button>
     </div>
-    <div id="content" class="max-w-4xl mx-auto bg-white p-6 sm:p-10 rounded-xl shadow-2xl">載入中...</div>
-</div>
 
-<div id="modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
-    <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
-        <div id="modalMessage" class="text-center text-lg mb-4 font-medium text-gray-800"></div>
-        <button id="modalCloseBtn" class="w-full py-2 bg-indigo-600 text-white rounded-md">確定</button>
+    <div id="content" class="max-w-4xl mx-auto bg-white p-6 sm:p-10 rounded-xl shadow-2xl">
+        <div class="text-center">載入中...</div>
+    </div>
+
+    <div id="modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
+            <div id="modalMessage" class="text-center text-lg mb-4"></div>
+            <button id="modalCloseBtn" class="w-full py-2 bg-indigo-600 text-white rounded-md">確定</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // 🚨 請填入正確的 GAS exec URL
+    // 🚨 請替換成你的 exec 網址
     const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxqMfeDnEI0Dt0yR6t_H9k0-5a41YlSl4biiG1iEPJyT0mQ1Uz1WY1CfkBOUZ7RzfVB/exec';
 
-    const userId = 'USER-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+    const getUserId = () => {
+        let id = localStorage.getItem('surveyUserId');
+        if (!id) {
+            id = 'USER-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+            localStorage.setItem('surveyUserId', id);
+        }
+        return id;
+    };
+
+    const userId = getUserId();
     let currentView = 'survey';
-    let evaluationsData = [];
     const contentDiv = document.getElementById('content');
     const toggleViewBtn = document.getElementById('toggleViewBtn');
 
-    // 100% 完整題目文字
     const questions = {
-        '一、講師之勝任程度': {
-            'Q1_1': '與課程主題相關之主題能力',
-            'Q1_2': '口語表達能力',
-            'Q1_3': '激發學員的參與及學習意願能力',
-            'Q1_4': '授課內容與課程主題之契合度',
-            'Q1_5': '對時間的掌握能力'
-        },
-        '二、課程內容': {
-            'Q2_1': '學習到觀念與新技巧的滿意度',
-            'Q2_2': '解決工作上所面臨問題之啟發',
-            'Q2_3': '對達成工作目標的助益',
-            'Q2_4': '教材內容的滿意度',
-            'Q2_5': '課程時數安排滿意度',
-            'Q2_6': '本課程達到您的預期效果程度'
-        },
-        '三、辦訓單位行政作業': {
-            'Q3_1': '對於訓練行政作業滿意度',
-            'Q3_2': '對於訓練場地之滿意度',
-            'Q3_3': '對於課程流程控管之品質滿意度',
-            'Q3_4': '若時間許可還有其他相關課程，您參與的意願度'
-        }
+        '一、講師之勝任程度(5代表非常滿意)': { 'Q1_1': '與課程主題相關之主題能力', 'Q1_2': '口語表達能力', 'Q1_3': '激發學員的參與及學習意願能力', 'Q1_4': '授課內容與課程主題之契合度', 'Q1_5': '對時間的掌握能力' },
+        '二、課程內容(5代表非常滿意)': { 'Q2_1': '學習到觀念與新技巧的滿意度', 'Q2_2': '解決工作上所面臨問題之啟發', 'Q2_3': '達對達成工作目標的助益', 'Q2_4': '教材內容的滿意度', 'Q2_5': '課程時數安排滿意度', 'Q2_6': '本課程達到您預期效果' },
+        '三、辦訓單位行政作業(5代表非常滿意)': { 'Q3_1': '對於訓練行政作業滿意度', 'Q3_2': '對於訓練場地之滿意度', 'Q3_3': '對於課程流程控管之品質滿意度', 'Q3_4': '若時間許可還有其他相關課程，參與意願' }
     };
 
     const showModal = (msg) => {
         document.getElementById('modalMessage').innerHTML = msg;
         document.getElementById('modal').classList.remove('hidden');
     };
+
     document.getElementById('modalCloseBtn').onclick = () => document.getElementById('modal').classList.add('hidden');
 
     const renderRatingOptions = (name) => {
-        let html = '<div class="flex space-x-3">';
+        let html = '<div class="flex space-x-2">';
         for (let i = 1; i <= 5; i++) {
             html += `<label><input type="radio" name="${name}" value="${i}" class="rating-input" required><span class="rating-label">${i}</span></label>`;
         }
@@ -84,78 +84,90 @@
     };
 
     const renderSurveyView = () => {
-        toggleViewBtn.textContent = '切換至報告模式 (HR 課長)';
+        toggleViewBtn.textContent = '切換至報告模式 (HR)';
         let html = `<form id="surveyForm" class="space-y-8">
-            <div class="p-6 bg-gray-50 rounded-lg border space-y-4">
-                <h2 class="text-xl font-bold border-b pb-2">基本資訊</h2>
-                <div><label class="block text-sm font-medium">課程編號</label><input type="text" name="courseId" required class="w-full p-3 border rounded uppercase"></div>
-                <div><label class="block text-sm font-medium">填表人職等</label><select name="jobTitle" required class="w-full p-3 border rounded">
-                    <option value="">請選擇</option>
-                    <option value="高階主管">高階主管</option><option value="中階主管">中階主管</option><option value="基層主管">基層主管</option><option value="一般員工">一般員工</option>
-                </select></div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <label class="block font-bold">課程編號 (必填)</label>
+                <input type="text" name="courseId" required class="w-full p-2 border rounded uppercase" placeholder="例如 ABC101">
+                <label class="block font-bold mt-4">職等</label>
+                <select name="jobTitle" class="w-full p-2 border rounded">
+                    <option>一般員工</option><option>基層主管</option><option>中階主管</option><option>高階主管</option>
+                </select>
             </div>`;
-
+        
         Object.entries(questions).forEach(([cat, qs]) => {
-            html += `<div><h2 class="text-2xl font-bold text-gray-700 mb-6 border-b-2 border-indigo-500 pb-2">${cat}</h2><div class="space-y-6">`;
+            html += `<div class="font-bold text-xl border-b-2 border-indigo-500 pb-2 mt-6">${cat}</div>`;
             Object.entries(qs).forEach(([key, text]) => {
-                html += `<div class="bg-white p-4 rounded-lg shadow-sm border"><p class="mb-4 font-medium">${text}</p><div class="flex items-center justify-between"><span class="text-sm text-gray-400">不滿意</span>${renderRatingOptions(key)}<span class="text-sm text-gray-400">非常滿意</span></div></div>`;
+                html += `<div class="py-4 border-b">
+                    <p class="mb-2">${text}</p>
+                    ${renderRatingOptions(key)}
+                </div>`;
             });
-            html += `</div></div>`;
         });
 
-        html += `<div><h2 class="text-2xl font-bold mb-6 border-b-2 border-indigo-500 pb-2">四、簡答題</h2><div class="space-y-6">
-            <div><label class="block font-medium">心得回饋</label><textarea name="Q4_1" class="w-full p-3 border rounded" rows="3"></textarea></div>
-            <div><label class="block font-medium">其他建議</label><textarea name="Q4_2" class="w-full p-3 border rounded" rows="3"></textarea></div>
-        </div></div><button type="submit" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-lg text-lg">提交問卷</button></form>`;
+        html += `<div class="mt-6">
+            <label class="block font-bold">您認為從本課程學習到什麼?(簡答)</label>
+            <textarea name="Q4_1" class="w-full p-2 border rounded" rows="3"></textarea>
+            <label class="block font-bold mt-4">其他建議</label>
+            <textarea name="Q4_2" class="w-full p-2 border rounded" rows="3"></textarea>
+        </div>
+        <button type="submit" class="w-full py-3 bg-indigo-600 text-white font-bold rounded-lg mt-6">提交問卷</button></form>`;
+        
         contentDiv.innerHTML = html;
         document.getElementById('surveyForm').onsubmit = handleSurveySubmit;
     };
 
     const handleSurveySubmit = async (e) => {
         e.preventDefault();
-        const btn = e.target.querySelector('button'); btn.disabled = true; btn.textContent = '提交中...';
+        const btn = e.target.querySelector('button');
+        btn.disabled = true; btn.textContent = '傳送中...';
+
         const fd = new FormData(e.target);
         const submission = { action: 'submit_survey', userId: userId };
-        fd.forEach((v, k) => submission[k === 'Q4_1' ? 'Q4_1_text' : (k === 'Q4_2' ? 'Q4_2_text' : k)] = v);
+        fd.forEach((val, key) => submission[key] = val);
 
         try {
-            await fetch(APPS_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(submission), headers: { 'Content-Type': 'text/plain' } });
-            showModal("✅ 提交成功！"); e.target.reset();
-        } catch (err) { showModal("❌ 連線異常"); }
-        finally { btn.disabled = false; btn.textContent = '提交問卷'; }
+            const res = await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(submission),
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+            });
+            const result = await res.json();
+            if (result.status === 'success') {
+                showModal("✅ 提交成功！");
+                e.target.reset();
+            } else {
+                showModal("⚠️ " + (result.message || "提交失敗"));
+            }
+        } catch (err) {
+            showModal("❌ 連線失敗，請檢查網路或 GAS 設定");
+        } finally {
+            btn.disabled = false; btn.textContent = '提交問卷';
+        }
     };
 
     const fetchReportData = async () => {
-        contentDiv.innerHTML = '<div class="text-center py-20">正在載入統計數據...</div>';
+        contentDiv.innerHTML = "讀取數據中...";
         try {
             const res = await fetch(`${APPS_SCRIPT_URL}?action=get_reports`);
             const result = await res.json();
-            if (result.status === 'success') { evaluationsData = result.data; renderReportView(evaluationsData); }
-        } catch (err) { contentDiv.innerHTML = '<div class="text-red-500 font-bold py-20 text-center">載入失敗！請確認 GAS 權限。</div>'; }
+            if (result.status === 'success') renderReportView(result.data);
+        } catch (err) {
+            contentDiv.innerHTML = "讀取失敗，請確認 GAS 是否已部署為「任何人」。";
+        }
     };
 
     const renderReportView = (data) => {
-        toggleViewBtn.textContent = '切換至問卷模式 (學員)';
-        if (data.length === 0) { contentDiv.innerHTML = "目前尚無資料。"; return; }
-        const ids = [...new Set(data.map(d => (d.courseId || 'NA').toUpperCase()))];
-        contentDiv.innerHTML = `<h2 class="text-3xl font-bold mb-6">統計報告</h2><div class="mb-8"><select id="courseFilter" class="w-full p-3 border rounded"><option value="ALL">所有課程</option>${ids.map(id => `<option value="${id}">${id}</option>`).join('')}</select></div><div id="reportDetail"></div>`;
-        document.getElementById('courseFilter').onchange = (e) => renderDetail(e.target.value, data);
-        renderDetail('ALL', data);
-    };
-
-    const renderDetail = (cid, data) => {
-        const detailDiv = document.getElementById('reportDetail');
-        const list = cid === 'ALL' ? data : data.filter(d => d.courseId.toUpperCase() === cid);
-        let html = `<div class="p-6 bg-gray-50 rounded-lg border shadow-inner"><h3 class="text-xl font-bold text-indigo-800 mb-6">樣本數: ${list.length} 筆</h3>`;
-        Object.entries(questions).forEach(([cat, qs]) => {
-            html += `<table class="w-full bg-white rounded-lg shadow-md mb-8"><thead><tr><th colspan="3" class="bg-indigo-50 p-3 text-left">${cat}</th></tr></thead><tbody>`;
-            Object.entries(qs).forEach(([key, text]) => {
-                const avg = (list.reduce((a, b) => a + parseFloat(b[key] || 0), 0) / list.length).toFixed(2);
-                html += `<tr><td class="p-3 text-sm w-1/2">${text}</td><td class="p-3 font-bold w-16 text-center">${avg}</td><td class="p-3"><div class="w-full bg-gray-200 rounded-full h-3"><div class="chart-bar bg-blue-500" style="width: ${(avg/5)*100}%"></div></div></td></tr>`;
-            });
-            html += `</tbody></table>`;
-        });
-        detailDiv.innerHTML = html + `</div>`;
+        toggleViewBtn.textContent = '切換至問卷模式';
+        if (data.length === 0) {
+            contentDiv.innerHTML = "目前尚無資料。";
+            return;
+        }
+        contentDiv.innerHTML = `<h2 class="text-2xl font-bold mb-4">統計報告</h2>
+            <div class="overflow-x-auto"><table class="w-full report-table">
+                <thead><tr><th>課程</th><th>學員職等</th><th>平均滿意度 (簡化)</th></tr></thead>
+                <tbody>${data.map(d => `<tr><td>${d.courseId}</td><td>${d.jobTitle}</td><td>${d.Q1_1}</td></tr>`).join('')}</tbody>
+            </table></div>`;
     };
 
     toggleViewBtn.onclick = () => {
