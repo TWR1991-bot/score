@@ -3,112 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>教育訓練滿意度調查與報告</title>
+    <title>教育訓練滿意度系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* 使用 Inter 字體 */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        body {
-            font-family: 'Inter', 'Noto Sans TC', sans-serif;
-            background-color: #f4f7f9;
-        }
-        /* 隱藏原生 Radio Button 但保留功能 */
-        .rating-input {
-            opacity: 0;
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            overflow: hidden;
-        }
-        /* 模擬 Radio Button 樣式 */
+        body { font-family: 'Inter', 'Noto Sans TC', sans-serif; background-color: #f4f7f9; }
+        .rating-input { opacity: 0; position: absolute; width: 1px; height: 1px; }
         .rating-label {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 9999px;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            font-weight: 600;
-            color: #4b5563; /* Gray-600 */
-            border: 2px solid #e5e7eb; /* Gray-200 */
+            display: flex; align-items: center; justify-content: center;
+            width: 40px; height: 40px; border-radius: 9999px; cursor: pointer;
+            transition: all 0.2s; font-weight: 600; color: #4b5563; border: 2px solid #e5e7eb;
         }
         .rating-input:checked + .rating-label {
-            background-color: #3b82f6; /* Blue-500 */
-            color: white;
-            border-color: #3b82f6;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+            background-color: #3b82f6; color: white; border-color: #3b82f6;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .rating-label:hover {
-            border-color: #93c5fd; /* Blue-300 */
-            transform: scale(1.05);
-        }
-
-        /* 讓 Report 頁面的表格更好看 */
-        .report-table th, .report-table td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        .report-table th {
-            background-color: #eef2ff; /* Indigo-50 */
-            font-weight: 700;
-            color: #4f46e5; /* Indigo-600 */
-        }
-        .report-table tr:last-child td {
-            border-bottom: none;
-        }
-        .report-table tbody tr:hover {
-            background-color: #f9fafb;
-        }
-        .chart-bar {
-            height: 20px;
-            border-radius: 4px;
-            transition: width 0.5s ease-out;
-        }
+        .report-table th, .report-table td { padding: 12px 16px; border-bottom: 1px solid #e5e7eb; }
+        .chart-bar { height: 10px; border-radius: 4px; transition: width 0.5s; }
     </style>
 </head>
 <body>
 
 <div id="app" class="min-h-screen p-4 sm:p-8">
     <div class="max-w-4xl mx-auto mb-6 flex justify-between items-center">
-        <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">教育訓練滿意度系統</h1>
-        <button id="toggleViewBtn" class="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg shadow-md hover:bg-indigo-700 transition duration-150 ease-in-out transform hover:scale-105">
-            切換至報告模式 (HR 課長)
+        <h1 class="text-3xl font-extrabold text-gray-900">教育訓練滿意度系統</h1>
+        <button id="toggleViewBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700">
+            切換至報告模式
         </button>
     </div>
 
     <div id="content" class="max-w-4xl mx-auto bg-white p-6 sm:p-10 rounded-xl shadow-2xl">
-        <div class="flex justify-center items-center h-48">
-            <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <span class="text-xl text-gray-600">系統載入中...</span>
-        </div>
+        <div class="text-center">載入中...</div>
     </div>
 
-    <div id="modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div id="modalMessage" class="mt-3 text-center text-lg font-medium text-gray-800"></div>
-            <div class="items-center px-4 py-3">
-                <button id="modalCloseBtn" class="w-full px-4 py-2 bg-indigo-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
-                    確定
-                </button>
-            </div>
+    <div id="modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
+            <div id="modalMessage" class="text-center text-lg mb-4"></div>
+            <button id="modalCloseBtn" class="w-full py-2 bg-indigo-600 text-white rounded-md">確定</button>
         </div>
     </div>
 </div>
 
 <script>
-    // ----------------------------------------------------------------------
-    // --- 🚨 重要設定：Google Apps Script Web App URL ---
-    // !!! 請務必將下方的佔位符替換為您部署 Google Apps Script 後獲得的實際 /exec URL !!!
-    // ----------------------------------------------------------------------
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxqMfeDnEI0Dt0yR6t_H9k0-5a41YlSl4biiG1iEPJyT0mQ1Uz1WY1CfkBOUZ7RzfVB/exec'; // <-- 替換此處為您的真實 URL
+    // 🚨 請替換成你的 exec 網址
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxqMfeDnEI0Dt0yR6t_H9k0-5a41YlSl4biiG1iEPJyT0mQ1Uz1WY1CfkBOUZ7RzfVB/exec';
 
-    // 為了模擬用戶 ID，我們使用一個基於瀏覽器的 ID
     const getUserId = () => {
         let id = localStorage.getItem('surveyUserId');
         if (!id) {
@@ -118,493 +57,125 @@
         return id;
     };
 
-    let userId = getUserId(); 
-    let currentView = 'survey'; // 'survey' or 'report'
-    let evaluationsData = []; // Store all evaluations for report
-
+    const userId = getUserId();
+    let currentView = 'survey';
     const contentDiv = document.getElementById('content');
     const toggleViewBtn = document.getElementById('toggleViewBtn');
 
-    // 職等選項
-    const jobTitles = [
-        '高階主管',
-        '中階主管',
-        '基層主管',
-        '一般員工'
-    ];
-
-    // 問卷問題定義
     const questions = {
-        '一、講師之勝任程度': {
-            'Q1_1': '與課程主題相關之主題能力',
-            'Q1_2': '口語表達能力',
-            'Q1_3': '激發學員的參與及學習意願能力',
-            'Q1_4': '授課內容與課程主題之契合度',
-            'Q1_5': '對時間的掌握能力',
-        },
-        '二、課程內容': {
-            'Q2_1': '學習到觀念與新技巧的滿意度',
-            'Q2_2': '解決工作上所面臨問題之啟發',
-            'Q2_3': '對達成工作目標的助益',
-            'Q2_4': '教材內容的滿意度',
-            'Q2_5': '課程時數安排滿意度',
-            'Q2_6': '本課程達到您的預期效果程度',
-        },
-        '三、辦訓單位行政作業': {
-            'Q3_1': '對於訓練行政作業滿意度',
-            'Q3_2': '對於訓練場地之滿意度',
-            'Q3_3': '對於課程流程控管之品質滿意度',
-            'Q3_4': '若時間許可還有其他相關課程，您參與的意願度',
-        },
-        '四、簡答題 (非必填)': {
-            'Q4_1': '您認為從本課程學習到什麼?',
-            'Q4_2': '其他建議',
-        }
+        '一、講師之勝任程度': { 'Q1_1': '與課程主題相關之主題能力', 'Q1_2': '口語表達能力', 'Q1_3': '激發學員參與', 'Q1_4': '內容契合度', 'Q1_5': '時間掌握' },
+        '二、課程內容': { 'Q2_1': '觀念與技巧滿意度', 'Q2_2': '解決問題啟發', 'Q2_3': '達成工作目標助益', 'Q2_4': '教材內容', 'Q2_5': '時數安排', 'Q2_6': '預期效果' },
+        '三、辦訓單位行政作業': { 'Q3_1': '行政作業', 'Q3_2': '場地滿意度', 'Q3_3': '流程控管', 'Q3_4': '參與意願' }
     };
 
-    // --- Helper Functions ---
-
-    /** 顯示自定義 Modal 提示框 */
-    const showModal = (message) => {
-        document.getElementById('modalMessage').innerHTML = message;
+    const showModal = (msg) => {
+        document.getElementById('modalMessage').innerHTML = msg;
         document.getElementById('modal').classList.remove('hidden');
-        document.getElementById('modalCloseBtn').onclick = () => {
-            document.getElementById('modal').classList.add('hidden');
-        };
     };
 
-    /** 渲染評分選項 (1~5分) */
+    document.getElementById('modalCloseBtn').onclick = () => document.getElementById('modal').classList.add('hidden');
+
     const renderRatingOptions = (name) => {
-        const labels = [
-            '1: 非常不滿意', 
-            '2: 不滿意', 
-            '3: 普通', 
-            '4: 滿意', 
-            '5: 非常滿意'
-        ];
-        let html = '<div class="flex justify-between sm:justify-start sm:space-x-4 flex-grow">'; 
+        let html = '<div class="flex space-x-2">';
         for (let i = 1; i <= 5; i++) {
-            html += `
-                <div class="relative flex flex-col items-center">
-                    <input type="radio" id="${name}-${i}" name="${name}" value="${i}" class="rating-input" required>
-                    <label for="${name}-${i}" class="rating-label" title="${labels[i-1]}">${i}</label>
-                    <span class="text-xs text-gray-500 mt-1 sm:hidden">${i}</span>
-                </div>
-            `;
+            html += `<label><input type="radio" name="${name}" value="${i}" class="rating-input" required><span class="rating-label">${i}</span></label>`;
         }
-        html += '</div>';
-        return html;
+        return html + '</div>';
     };
 
-    /** 渲染問卷介面 (Survey View) */
     const renderSurveyView = () => {
-        // 標題切換
-        toggleViewBtn.textContent = '切換至報告模式 (HR 課長)';
-
-        let html = `
-            <form id="surveyForm">
-                <p class="text-sm text-gray-500 mb-6 border-l-4 border-indigo-400 pl-3 bg-indigo-50 p-2 rounded-md">
-                    <strong class="text-indigo-600">學員 ID ${userId.substring(0, 8)}...：</strong> 您的填寫結果將被用於數據統計，且不會直接連結至您的身份，請安心填寫。(* 標記為必填)
-                </p>
-
-                <div class="space-y-4 mb-10 p-6 bg-gray-50 rounded-lg border">
-                    <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2">基本資訊</h2>
-
-                    <div>
-                        <label for="courseId" class="block text-sm font-medium text-gray-700">課程編號 *</label>
-                        <input type="text" id="courseId" name="courseId" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm uppercase" placeholder="例如: ABC101">
-                    </div>
-
-                    <div>
-                        <label for="jobTitle" class="block text-sm font-medium text-gray-700">填表人職等 *</label>
-                        <select id="jobTitle" name="jobTitle" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <option value="">請選擇您的職等</option>
-                            ${jobTitles.map(title => `<option value="${title}">${title}</option>`).join('')}
-                        </select>
-                    </div>
-                </div>
-
-                ${Object.entries(questions).slice(0, 3).map(([category, qs]) => `
-                    <div class="mb-10">
-                        <h2 class="text-2xl font-semibold text-gray-700 mb-6 border-b-2 border-indigo-500 pb-2">${category}</h2>
-                        <div class="space-y-6">
-                            ${Object.entries(qs).map(([key, text]) => `
-                                <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-indigo-100">
-                                    <p class="text-base font-medium text-gray-800 mb-3">${key.split('_')[1]}. ${text} *</p>
-                                    <div class="flex items-center justify-between mt-2">
-                                        <span class="text-sm text-red-500 font-medium whitespace-nowrap hidden sm:inline">1: 非常不滿意</span>
-                                        ${renderRatingOptions(key)}
-                                        <span class="text-sm text-green-600 font-medium whitespace-nowrap hidden sm:inline">5: 非常滿意</span>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `).join('')}
-
-                <div class="mb-10">
-                    <h2 class="text-2xl font-semibold text-gray-700 mb-6 border-b-2 border-indigo-500 pb-2">${questions['四、簡答題 (非必填)']['Q4_1'].split('.')[0]}. 簡答題 (非必填)</h2>
-                    <div class="space-y-6">
-                        <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-indigo-100">
-                            <label for="Q4_1" class="block text-base font-medium text-gray-800 mb-1">${questions['四、簡答題 (非必填)']['Q4_1']}</label>
-                            <textarea id="Q4_1" name="Q4_1" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="請填寫您的學習心得"></textarea>
-                        </div>
-                        <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-indigo-100">
-                            <label for="Q4_2" class="block text-base font-medium text-gray-800 mb-1">${questions['四、簡答題 (非必填)']['Q4_2']}</label>
-                            <textarea id="Q4_2" name="Q4_2" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="請填寫其他寶貴建議"></textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="text-center pt-5">
-                    <button type="submit" class="px-8 py-3 bg-indigo-600 text-white text-xl font-semibold rounded-lg shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition duration-150 ease-in-out transform hover:scale-[1.02]">
-                        提交問卷
-                    </button>
-                </div>
-            </form>
-        `;
-        contentDiv.innerHTML = html;
-        document.getElementById('surveyForm').addEventListener('submit', handleSurveySubmit);
-    };
-
-    /** 處理問卷提交 (使用 fetch 連接到 Google Apps Script) */
-    const handleSurveySubmit = async (event) => {
-        event.preventDefault();
-
-        // ** 檢查 APPS_SCRIPT_URL 是否已替換 **
-        if (APPS_SCRIPT_URL === 'YOUR_DEPLOYED_WEB_APP_URL') {
-            showModal(`
-                <p class="text-red-600 font-bold">部署錯誤！</p>
-                <p class="text-sm mt-2">請先完成 Google Apps Script 部署，並將 HTML 程式碼中的 APPS_SCRIPT_URL 變數替換成您實際取得的 /exec 網址。</p>
-            `);
-            return;
-        }
-
-        const form = event.target;
-        const submitButton = form.querySelector('button[type="submit"]');
-        submitButton.disabled = true;
-        submitButton.textContent = '提交中...';
-
-        const data = new FormData(form);
-        // 使用 POST 提交，並指定 action 為 'submit_survey'
-        const submission = { action: 'submit_survey', userId: userId };
-
-        // 檢查課程編號是否已填寫
-        const courseId = data.get('courseId').toUpperCase().trim();
-        submission.courseId = courseId;
-        submission.jobTitle = data.get('jobTitle');
-
-        // 收集評分
-        let allRatingsValid = true;
-        Object.values(questions).slice(0, 3).forEach(qs => {
-            Object.keys(qs).forEach(key => {
-                const value = parseInt(data.get(key));
-                if (isNaN(value) || value < 1 || value > 5) {
-                    allRatingsValid = false;
-                }
-                submission[key] = value;
-            });
-        });
-
-        if (!allRatingsValid) {
-            submitButton.disabled = false;
-            submitButton.textContent = '提交問卷';
-            showModal("請確保所有滿意度問題皆已填寫 (1~5分)。");
-            return;
-        }
-
-        // 收集簡答題
-        submission.Q4_1_text = data.get('Q4_1') || '';
-        submission.Q4_2_text = data.get('Q4_2') || '';
-
-        try {
-            // 發送 JSON 數據到 Apps Script Web App
-            const response = await fetch(APPS_SCRIPT_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(submission)
-            });
-
-            if (!response.ok) {
-                // 處理網路層級的錯誤 (例如 500 伺服器錯誤)
-                throw new Error(`HTTP 錯誤: ${response.status} ${response.statusText}`);
-            }
-
-            const result = await response.json();
-
-            if (result.status === 'success') {
-                showModal("滿意度問卷已成功提交！您可以繼續填寫其他課程的問卷。");
-                form.reset(); // 清空表單
-            } else if (result.status === 'duplicate') {
-                showModal(`您已填寫過課程編號 ${courseId} 的問卷。`);
-            } else {
-                // 處理 Apps Script 返回的其他錯誤
-                showModal(`
-                    提交失敗: ${result.message || 'Apps Script 處理錯誤。'}
-                    <p class="text-xs text-gray-500 mt-2">請檢查 Apps Script 的執行紀錄 (Execution Logs)。</p>
-                `);
-            }
-
-        } catch (error) {
-            console.error("提交問卷時發生錯誤: ", error);
-            showModal(`
-                <p class="text-red-600 font-bold">連線失敗！</p>
-                <p class="text-sm mt-2">請確認您的 Apps Script URL 和部署權限 (設為「任何人」)。</p>
-                <p class="text-xs text-gray-500 mt-1">錯誤訊息: ${error.message}</p>
-            `);
-        } finally {
-            submitButton.disabled = false;
-            submitButton.textContent = '提交問卷';
-        }
-    };
-
-    // --- 報告相關 Helper Functions ---
-    /** 獲取報告數據 (使用 fetch 連接到 Google Apps Script) */
-    const fetchReportData = async () => {
-        if (APPS_SCRIPT_URL === 'YOUR_DEPLOYED_WEB_APP_URL') {
-             contentDiv.innerHTML = `<div class="text-center py-10 bg-red-100 rounded-lg shadow-inner"><p class="text-xl text-red-700 font-bold">請先部署 Google Apps Script 並設定 APPS_SCRIPT_URL。</p></div>`;
-            return;
-        }
-
-        // 顯示載入中
-        contentDiv.innerHTML = `
-            <div class="flex justify-center items-center h-48">
-                <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span class="text-xl text-gray-600">正在從 Google Sheets 載入數據...</span>
-            </div>
-        `;
-
-        try {
-            // Apps Script 應處理 GET 請求，並帶上 action 參數
-            const response = await fetch(`${APPS_SCRIPT_URL}?action=get_reports`);
-            if (!response.ok) throw new Error('伺服器響應錯誤');
-
-            const result = await response.json();                        
-            if (result.status === 'success') {
-                evaluationsData = result.data || [];
-                renderReportView(evaluationsData);
-            } else {
-                throw new Error(result.message || '獲取報告數據失敗');
-            }
-
-        } catch (error) {
-            console.error("獲取報告數據時發生錯誤: ", error);
-            contentDiv.innerHTML = `<div class="text-center py-10 bg-red-100 rounded-lg shadow-inner"><p class="text-xl text-red-700 font-bold">載入報告數據失敗，請檢查 Apps Script 設定。</p><p class="text-sm text-gray-700 mt-2">錯誤訊息: ${error.message}</p></div>`;
-        }
-    };
-
-    /** 計算平均分數 */
-    const calculateAverages = (data) => {
-        const stats = {};
-        const ratingKeys = Object.keys(questions['一、講師之勝任程度']).concat(
-            Object.keys(questions['二、課程內容']),
-            Object.keys(questions['三、辦訓單位行政作業'])
-        );
-
-        // 1. 依課程編號分組
-        const groupedByCourse = data.reduce((acc, submission) => {
-            // Apps Script 返回的數據可能包含大小寫不一的 courseId，統一轉為大寫和去除空格
-            const id = (submission.courseId || 'N/A').toUpperCase().trim(); 
-            if (!acc[id]) {
-                acc[id] = { submissions: [], totalCount: 0, sum: {}, openFeedback: [] };
-                ratingKeys.forEach(key => acc[id].sum[key] = 0);
-            }
-            acc[id].submissions.push(submission);
-            acc[id].totalCount++;
-
-            // 累計評分總和
-            ratingKeys.forEach(key => {
-                // Apps Script 返回的數據可能都是字串，需要轉換
-                const score = parseFloat(submission[key]); 
-                if (!isNaN(score)) {
-                    acc[id].sum[key] += score;
-                }
-            });
-
-            // 收集簡答
-            if (submission.Q4_1_text) {
-                acc[id].openFeedback.push({ type: '學習心得', text: submission.Q4_1_text, jobTitle: submission.jobTitle });
-            }
-            if (submission.Q4_2_text) {
-                acc[id].openFeedback.push({ type: '其他建議', text: submission.Q4_2_text, jobTitle: submission.jobTitle });
-            }
-
-            return acc;
-        }, {});
-
-        // 2. 計算平均值
-        Object.keys(groupedByCourse).forEach(courseId => {
-            const courseData = groupedByCourse[courseId];
-            stats[courseId] = {
-                totalCount: courseData.totalCount,
-                averages: {},
-                openFeedback: courseData.openFeedback
-            };
-
-            ratingKeys.forEach(key => {
-                const totalScore = courseData.sum[key];
-                stats[courseId].averages[key] = (totalScore / courseData.totalCount).toFixed(2);
-            });
-        });
-
-        return stats;
-    };
-
-    /** 渲染報告介面 (Report View) */
-    const renderReportView = (data) => {
-        // 標題切換
-        toggleViewBtn.textContent = '切換至問卷模式 (學員)';
-
-        if (data.length === 0) {
-            contentDiv.innerHTML = `
-                <div class="text-center py-20 bg-yellow-50 rounded-lg shadow-inner">
-                    <svg class="mx-auto h-12 w-12 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                    <h2 class="mt-4 text-3xl font-bold text-yellow-700">尚無問卷資料</h2>
-                    <p class="mt-2 text-xl text-gray-600">請等待學員填寫後，數據將即時顯示於此。</p>
-                </div>
-            `;
-            return;
-        }
-
-        const stats = calculateAverages(data);
-        const courseIds = Object.keys(stats).sort();
-
-        let html = `
-            <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-2">滿意度調查報告 (HR 課長)</h2>
-
-            <div class="mb-8 p-4 bg-indigo-50 rounded-lg border border-indigo-200">
-                <label for="courseFilter" class="block text-lg font-semibold text-indigo-800 mb-2">選擇課程編號查看詳細報告:</label>
-                <select id="courseFilter" class="block w-full border-indigo-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg">
-                    <option value="ALL">-- 顯示所有課程 (共 ${data.length} 筆回覆) --</option>
-                    ${courseIds.map(id => `<option value="${id}">${id} (共 ${stats[id].totalCount} 筆回覆)</option>`).join('')}
+        toggleViewBtn.textContent = '切換至報告模式 (HR)';
+        let html = `<form id="surveyForm" class="space-y-8">
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <label class="block font-bold">課程編號 (必填)</label>
+                <input type="text" name="courseId" required class="w-full p-2 border rounded uppercase" placeholder="例如 ABC101">
+                <label class="block font-bold mt-4">職等</label>
+                <select name="jobTitle" class="w-full p-2 border rounded">
+                    <option>一般員工</option><option>基層主管</option><option>中階主管</option><option>高階主管</option>
                 </select>
-            </div>                        
-            <div id="reportDetail">
-                ${renderCourseDetailReport('ALL', stats)}
-            </div>
-        `;
+            </div>`;
+        
+        Object.entries(questions).forEach(([cat, qs]) => {
+            html += `<div class="font-bold text-xl border-b-2 border-indigo-500 pb-2 mt-6">${cat}</div>`;
+            Object.entries(qs).forEach(([key, text]) => {
+                html += `<div class="py-4 border-b">
+                    <p class="mb-2">${text}</p>
+                    ${renderRatingOptions(key)}
+                </div>`;
+            });
+        });
+
+        html += `<div class="mt-6">
+            <label class="block font-bold">學習心得 (簡答)</label>
+            <textarea name="Q4_1" class="w-full p-2 border rounded" rows="3"></textarea>
+            <label class="block font-bold mt-4">其他建議</label>
+            <textarea name="Q4_2" class="w-full p-2 border rounded" rows="3"></textarea>
+        </div>
+        <button type="submit" class="w-full py-3 bg-indigo-600 text-white font-bold rounded-lg mt-6">提交問卷</button></form>`;
+        
         contentDiv.innerHTML = html;
-
-        document.getElementById('courseFilter').addEventListener('change', (e) => {
-            const courseId = e.target.value;
-            document.getElementById('reportDetail').innerHTML = renderCourseDetailReport(courseId, stats);
-        });
+        document.getElementById('surveyForm').onsubmit = handleSurveySubmit;
     };
 
-    /** 渲染單一或全部課程的詳細報告 */
-    const renderCourseDetailReport = (courseId, stats) => {
-        let html = '';
-        const keys = Object.keys(questions['一、講師之勝任程度']).concat(
-            Object.keys(questions['二、課程內容']),
-            Object.keys(questions['三、辦訓單位行政作業'])
-        );
+    const handleSurveySubmit = async (e) => {
+        e.preventDefault();
+        const btn = e.target.querySelector('button');
+        btn.disabled = true; btn.textContent = '傳送中...';
 
-        const coursesToDisplay = courseId === 'ALL' ? Object.keys(stats) : [courseId];
+        const fd = new FormData(e.target);
+        const submission = { action: 'submit_survey', userId: userId };
+        fd.forEach((val, key) => submission[key] = val);
 
-        if (coursesToDisplay.length === 0) { 
-             return `<p class="text-center text-xl text-red-500 py-10">查無資料</p>`;
-        }
-
-        coursesToDisplay.forEach(id => {
-            const currentStats = stats[id];
-            const isAll = courseId === 'ALL';
-
-            // 處理總平均
-            const totalAvgScore = (keys.reduce((sum, key) => sum + parseFloat(currentStats.averages[key]), 0) / keys.length).toFixed(2);
-            const totalAvgColor = totalAvgScore >= 4 ? 'bg-green-500' : totalAvgScore >= 3 ? 'bg-yellow-500' : 'bg-red-500';
-
-            html += `
-                <div class="${!isAll ? 'mt-8 border-t-4 border-indigo-600 pt-6' : 'mt-4'} p-4 bg-gray-50 rounded-lg shadow-inner">
-                    <h3 class="text-2xl font-bold text-indigo-800 mb-4">${isAll ? '總體趨勢' : `課程編號: ${id} 詳細報告`}</h3>
-                    <p class="text-gray-700 mb-4">總填寫人數: <span class="text-2xl font-extrabold text-indigo-600">${currentStats.totalCount}</span> 筆</p>
-
-                    <div class="p-4 rounded-lg shadow-md mb-6 ${totalAvgColor} text-white">
-                        <p class="text-xl font-medium">課程整體滿意度平均:</p>
-                        <p class="text-4xl font-extrabold">${totalAvgScore} <span class="text-2xl">/ 5.00</span></p>
-                    </div>
-
-                    <h4 class="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">各項滿意度平均得分 (5分制)</h4>
-                    <table class="w-full report-table rounded-xl overflow-hidden shadow-lg mb-8">
-                        <thead>
-                            <tr>
-                                <th>類別/題目</th>
-                                <th class="w-1/4">平均得分</th>
-                                <th class="w-1/4">滿意度視覺化</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${Object.entries(questions).slice(0, 3).map(([category, qs]) => `
-                                <tr>
-                                    <td colspan="3" class="bg-indigo-100 text-indigo-700 font-semibold">${category}</td>
-                                </tr>
-                                ${Object.entries(qs).map(([key, text]) => {
-                                    const avg = currentStats.averages[key];
-                                    const percentage = (avg / 5) * 100;
-                                    const barColor = percentage >= 80 ? 'bg-green-500' : percentage >= 60 ? 'bg-yellow-500' : 'bg-red-500';
-                                    return `
-                                        <tr>
-                                            <td class="text-sm">${text}</td>
-                                            <td class="font-bold text-lg">${avg}</td>
-                                            <td>
-                                                <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                                    <div class="chart-bar ${barColor}" style="width: ${percentage}%" title="${avg}分"></div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    `;
-                                }).join('')}
-                            `).join('')}
-                        </tbody>
-                    </table>
-
-                    <h4 class="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">簡答回饋總覽</h4>
-                    <div class="space-y-4">
-                        ${currentStats.openFeedback.length > 0 ? currentStats.openFeedback.map(fb => `
-                            <div class="p-4 bg-white rounded-lg shadow-md border-l-4 border-gray-400">
-                                <p class="text-sm font-semibold text-gray-600 mb-1">
-                                    [${fb.type}] - <span class="text-indigo-600">${fb.jobTitle}</span>
-                                </p>
-                                <p class="text-gray-800 whitespace-pre-wrap">${fb.text}</p>
-                            </div>
-                        `).join('') : '<p class="text-gray-500 italic">無簡答回饋。</p>'}
-                    </div>
-                </div>
-            `;
-        });
-
-        return html;
-    };
-
-    // --- 應用程式啟動 ---
-    const initApp = () => {
-        // 預設切換到問卷模式
-        switchView('survey');
-    };
-
-    /** 切換視圖 */
-    const switchView = (view) => {
-        currentView = view;
-        if (currentView === 'survey') {
-            renderSurveyView(); 
-        } else {
-            fetchReportData(); // 切換到報告模式時，從 Apps Script 獲取數據
+        try {
+            const res = await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(submission),
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+            });
+            const result = await res.json();
+            if (result.status === 'success') {
+                showModal("✅ 提交成功！");
+                e.target.reset();
+            } else {
+                showModal("⚠️ " + (result.message || "提交失敗"));
+            }
+        } catch (err) {
+            showModal("❌ 連線失敗，請檢查網路或 GAS 設定");
+        } finally {
+            btn.disabled = false; btn.textContent = '提交問卷';
         }
     };
 
-    // 註冊切換按鈕事件
-    toggleViewBtn.addEventListener('click', () => {
-        if (currentView === 'survey') {
-            switchView('report');
-        } else {
-            switchView('survey');
+    const fetchReportData = async () => {
+        contentDiv.innerHTML = "讀取數據中...";
+        try {
+            const res = await fetch(`${APPS_SCRIPT_URL}?action=get_reports`);
+            const result = await res.json();
+            if (result.status === 'success') renderReportView(result.data);
+        } catch (err) {
+            contentDiv.innerHTML = "讀取失敗，請確認 GAS 是否已部署為「任何人」。";
         }
-    });
+    };
 
-    // 啟動應用程式
-    initApp();
+    const renderReportView = (data) => {
+        toggleViewBtn.textContent = '切換至問卷模式';
+        if (data.length === 0) {
+            contentDiv.innerHTML = "目前尚無資料。";
+            return;
+        }
+        contentDiv.innerHTML = `<h2 class="text-2xl font-bold mb-4">統計報告</h2>
+            <div class="overflow-x-auto"><table class="w-full report-table">
+                <thead><tr><th>課程</th><th>學員職等</th><th>平均滿意度 (簡化)</th></tr></thead>
+                <tbody>${data.map(d => `<tr><td>${d.courseId}</td><td>${d.jobTitle}</td><td>${d.Q1_1}</td></tr>`).join('')}</tbody>
+            </table></div>`;
+    };
+
+    toggleViewBtn.onclick = () => {
+        if (currentView === 'survey') { currentView = 'report'; fetchReportData(); }
+        else { currentView = 'survey'; renderSurveyView(); }
+    };
+
+    renderSurveyView();
 </script>
 </body>
 </html>
